@@ -1,0 +1,28 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+       java: openjdk8
+  pre_build:
+    commands:
+            - apt-get update
+            - apt-get install -y jq
+  build:
+    commands:
+        - mvn clean install sonar:sonar
+         -Dmaven.test.skip=true
+         -Dsonar.projectName=
+         -Dsonar.projectKey=
+         -Dsonar.host.url=
+         -Dsonar.login=
+        - sleep 5
+        - curl http://> result.json
+        - cat result.json
+        - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+  post_build:
+    commands:
+      - echo Build completed on `date`        
+artifacts:
+  files:
+    - '**/*'
+  name: SonarZip
